@@ -101,6 +101,7 @@
 <script>
   import AddOrUpdate from './schedule-add-or-update'
   import Log from './schedule-log'
+  import { dataSysScheduleList } from '@/utils/httpData'
   export default {
     data () {
       return {
@@ -128,24 +129,32 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/sys/schedule/list'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'beanName': this.dataForm.beanName
-          })
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
+
+        const data = dataSysScheduleList()
+        if(data){
+          this.dataList = []
+          this.totalPage = 0
           this.dataListLoading = false
-        })
+        } else {
+          this.$http({
+            url: this.$http.adornUrl('/sys/schedule/list'),
+            method: 'get',
+            params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'beanName': this.dataForm.beanName
+            })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.dataList = data.page.list
+              this.totalPage = data.page.totalCount
+            } else {
+              this.dataList = []
+              this.totalPage = 0
+            }
+            this.dataListLoading = false
+          })
+        }
       },
       // 每页数
       sizeChangeHandle (val) {

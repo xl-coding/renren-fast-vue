@@ -15,6 +15,7 @@
 </template>
 
 <script>
+  import { dataSysUserInfo } from '@/utils/httpData'
   import MainNavbar from './main-navbar'
   import MainSidebar from './main-sidebar'
   import MainContent from './main-content'
@@ -73,17 +74,26 @@
       },
       // 获取当前管理员信息
       getUserInfo () {
-        this.$http({
-          url: this.$http.adornUrl('/sys/user/info'),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.loading = false
-            this.userId = data.user.userId
-            this.userName = data.user.username
-          }
-        })
+        this.loading = false
+
+        const data = dataSysUserInfo()
+        if(data){
+          this.loading = false
+          this.userId = data.user.userId
+          this.userName = data.user.username
+        } else {
+          this.$http({
+            url: this.$http.adornUrl('/sys/user/info'),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.loading = false
+              this.userId = data.user.userId
+              this.userName = data.user.username
+            }
+          })
+        }
       }
     }
   }
